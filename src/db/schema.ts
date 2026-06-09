@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -165,3 +166,122 @@ export const payrollPayments = pgTable("payroll_payments", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  organizationMembers: many(organizationMembers),
+  createdWorkDays: many(workDays),
+  createdExpenses: many(expenses),
+  createdIncomes: many(incomes),
+  createdPayrollPayments: many(payrollPayments),
+}));
+
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  organizationMembers: many(organizationMembers),
+  employees: many(employees),
+  workDays: many(workDays),
+  expenseCategories: many(expenseCategories),
+  expenses: many(expenses),
+  incomes: many(incomes),
+  payrollPayments: many(payrollPayments),
+}));
+
+export const organizationMembersRelations = relations(
+  organizationMembers,
+  ({ one }) => ({
+    organization: one(organizations, {
+      fields: [organizationMembers.organizationId],
+      references: [organizations.id],
+    }),
+    user: one(users, {
+      fields: [organizationMembers.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const employeesRelations = relations(employees, ({ many, one }) => ({
+  organization: one(organizations, {
+    fields: [employees.organizationId],
+    references: [organizations.id],
+  }),
+  workEntries: many(workEntries),
+  payrollPayments: many(payrollPayments),
+}));
+
+export const workDaysRelations = relations(workDays, ({ many, one }) => ({
+  organization: one(organizations, {
+    fields: [workDays.organizationId],
+    references: [organizations.id],
+  }),
+  createdByUser: one(users, {
+    fields: [workDays.createdBy],
+    references: [users.id],
+  }),
+  workEntries: many(workEntries),
+}));
+
+export const workEntriesRelations = relations(workEntries, ({ one }) => ({
+  workDay: one(workDays, {
+    fields: [workEntries.workDayId],
+    references: [workDays.id],
+  }),
+  employee: one(employees, {
+    fields: [workEntries.employeeId],
+    references: [employees.id],
+  }),
+}));
+
+export const expenseCategoriesRelations = relations(
+  expenseCategories,
+  ({ many, one }) => ({
+    organization: one(organizations, {
+      fields: [expenseCategories.organizationId],
+      references: [organizations.id],
+    }),
+    expenses: many(expenses),
+  }),
+);
+
+export const expensesRelations = relations(expenses, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [expenses.organizationId],
+    references: [organizations.id],
+  }),
+  category: one(expenseCategories, {
+    fields: [expenses.categoryId],
+    references: [expenseCategories.id],
+  }),
+  createdByUser: one(users, {
+    fields: [expenses.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const incomesRelations = relations(incomes, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [incomes.organizationId],
+    references: [organizations.id],
+  }),
+  createdByUser: one(users, {
+    fields: [incomes.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const payrollPaymentsRelations = relations(
+  payrollPayments,
+  ({ one }) => ({
+    organization: one(organizations, {
+      fields: [payrollPayments.organizationId],
+      references: [organizations.id],
+    }),
+    employee: one(employees, {
+      fields: [payrollPayments.employeeId],
+      references: [employees.id],
+    }),
+    createdByUser: one(users, {
+      fields: [payrollPayments.createdBy],
+      references: [users.id],
+    }),
+  }),
+);
