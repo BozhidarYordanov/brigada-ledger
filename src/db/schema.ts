@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -37,3 +45,21 @@ export const organizationMembers = pgTable(
     ),
   ],
 );
+
+export const employees = pgTable("employees", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  organizationId: uuid("organization_id")
+    .notNull()
+    .references(() => organizations.id),
+  fullName: text("full_name").notNull(),
+  phone: text("phone"),
+  defaultDailyWage: numeric("default_daily_wage", {
+    precision: 12,
+    scale: 2,
+  }),
+  notes: text("notes"),
+  isActive: boolean("is_active").notNull().default(true),
+  archivedAt: timestamp("archived_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
