@@ -133,3 +133,35 @@ export const expenses = pgTable("expenses", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const incomes = pgTable("incomes", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  organizationId: uuid("organization_id")
+    .notNull()
+    .references(() => organizations.id),
+  incomeDate: date("income_date").notNull(),
+  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+  source: text("source"),
+  description: text("description"),
+  paymentMethod: text("payment_method"),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const payrollPayments = pgTable("payroll_payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  organizationId: uuid("organization_id")
+    .notNull()
+    .references(() => organizations.id),
+  employeeId: uuid("employee_id")
+    .notNull()
+    .references(() => employees.id),
+  paymentDate: date("payment_date").notNull(),
+  periodStart: date("period_start"),
+  periodEnd: date("period_end"),
+  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+  note: text("note"),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
