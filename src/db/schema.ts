@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   numeric,
   pgTable,
   text,
@@ -63,3 +64,48 @@ export const employees = pgTable("employees", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const workDays = pgTable(
+  "work_days",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id),
+    workDate: date("work_date").notNull(),
+    notes: text("notes"),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("work_days_organization_id_work_date_unique").on(
+      table.organizationId,
+      table.workDate,
+    ),
+  ],
+);
+
+export const workEntries = pgTable(
+  "work_entries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workDayId: uuid("work_day_id")
+      .notNull()
+      .references(() => workDays.id, { onDelete: "cascade" }),
+    employeeId: uuid("employee_id")
+      .notNull()
+      .references(() => employees.id),
+    dailyWage: numeric("daily_wage", { precision: 12, scale: 2 }).notNull(),
+    hoursWorked: numeric("hours_worked", { precision: 5, scale: 2 }),
+    note: text("note"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("work_entries_work_day_id_employee_id_unique").on(
+      table.workDayId,
+      table.employeeId,
+    ),
+  ],
+);
