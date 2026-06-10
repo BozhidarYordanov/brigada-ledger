@@ -22,7 +22,7 @@ export const users = pgTable("users", {
 export const organizations = pgTable("organizations", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
-  currency: text("currency").notNull().default("BGN"),
+  currency: text("currency").notNull().default("EUR"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

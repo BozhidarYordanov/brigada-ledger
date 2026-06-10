@@ -36,6 +36,13 @@
       "when": 1781017231886,
       "tag": "0004_rainy_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781093359990,
+      "tag": "0005_mighty_red_ghost",
+      "breakpoints": true
     }
   ]
 }
